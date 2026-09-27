@@ -25,9 +25,21 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 
+// Умный SSL: включаем только если БД требует (по sslmode=require в URL)
+const dbUrl = process.env.DATABASE_URL || '';
+const needsSSL = dbUrl.includes('sslmode=require') || dbUrl.includes('neon.tech') || dbUrl.includes('aiven');
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  connectionString: dbUrl,
+  ssl: needsSSL ? { rejectUnauthorized: false } : false
+});
+
+// Не давать приложению падать при ошибках БД
+process.on('unhandledRejection', (err) => {
+  console.error('⚠️ Unhandled rejection:', err.message);
+});
+process.on('uncaughtException', (err) => {
+  console.error('⚠️ Uncaught exception:', err.message);
 });
 
 app.use(cors());
