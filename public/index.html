@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Википедия</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{--bg:#f8f9fa;--surface:#fff;--text:#202122;--muted:#54595d;--link:#3366cc;--red:#d33;--border:#c8ccd1;--border-l:#eaecf0;--accent:#3366cc;--success:#14866d;--danger:#d33;--warning:#f0a90c;--radius:12px;--radius-sm:8px;--shadow:0 2px 8px rgba(0,0,0,.06);--shadow-lg:0 8px 24px rgba(0,0,0,.12);--font:"Segoe UI",Roboto,sans-serif;--serif:Georgia,serif}
+[data-theme="dark"]{--bg:#0e1116;--surface:#181c22;--text:#eaecf0;--muted:#a2a9b1;--link:#6ba3ff;--red:#ff6b6b;--border:#2f353d;--border-l:#242930;--accent:#4a7aff;--shadow:0 2px 8px rgba(0,0,0,.3);--shadow-lg:0 8px 24px rgba(0,0,0,.5)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.65;font-size:14px;min-height:100vh;transition:background .3s,color .3s}
+a{color:var(--link);text-decoration:none;cursor:pointer}
+a:hover{text-decoration:underline}
+button{font-family:inherit;cursor:pointer}
+header{background:var(--surface);border-bottom:1px solid var(--border-l);padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:var(--shadow);display:flex;align-items:center;height:100px;gap:24px}
+.logo-box{display:flex;align-items:center;gap:16px;cursor:pointer;flex-shrink:0}
+.logo-img{height:90px;width:90px;object-fit:cover;border-radius:50%;box-shadow:var(--shadow-lg);transition:transform .3s}
+.logo-img:hover{transform:scale(1.05)}
+.logo-title{font-family:var(--serif);font-size:32px;font-weight:bold;white-space:nowrap;background:linear-gradient(135deg,var(--accent),#6ba3ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.search-wrap{flex:1;max-width:600px;margin:0 auto;position:relative}
+.search-input{width:100%;padding:12px 46px 12px 18px;border:1px solid var(--border);border-radius:26px;background:var(--bg);color:var(--text);font-size:14px;outline:none}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(51,102,204,.15)}
+.search-btn{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:var(--accent);border:none;color:#fff;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.search-results{position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);margin-top:8px;max-height:400px;overflow-y:auto;display:none;z-index:200}
+.search-results.active{display:block}
+.search-item{padding:12px 16px;border-bottom:1px solid var(--border-l);cursor:pointer}
+.search-item:last-child{border-bottom:none}
+.search-item:hover{background:var(--bg)}
+.search-item .t{font-weight:600}
+.search-item .s{font-size:12px;color:var(--muted);margin-top:2px}
+.user-area{display:flex;gap:12px;align-items:center;font-size:13px;flex-shrink:0}
+.user-area a,.user-area button{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-sm);border:none;background:transparent;color:var(--text);font-size:13px}
+.user-area a:hover,.user-area button:hover{background:var(--bg);text-decoration:none}
+.btn-header{padding:9px 18px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:500}
+.btn-header.outline{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.layout{max-width:1600px;margin:0 auto;padding:24px;display:grid;grid-template-columns:200px 1fr 200px;gap:20px}
+.sidebar{width:100%;font-size:13px;position:sticky;top:124px;align-self:flex-start;max-height:calc(100vh - 140px);overflow-y:auto}
+.side-title{font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700;letter-spacing:.6px;margin-bottom:8px;padding-left:8px}
+.side-list{list-style:none;margin-bottom:24px}
+.side-link{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:var(--radius-sm);color:var(--text)}
+.side-link:hover{background:var(--surface);text-decoration:none;color:var(--accent)}
+.side-link i{width:18px;text-align:center;color:var(--muted)}
+.main{min-width:0}
+.banner-col{display:flex;flex-direction:column;gap:16px;position:sticky;top:124px;align-self:flex-start}
+.banner-card{background:var(--surface);border:1px solid var(--border-l);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:all .2s;cursor:pointer}
+.banner-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.banner-card img{width:100%;height:auto;display:block}
+.banner-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;text-align:center;padding:2px;background:var(--bg)}
+.card{background:var(--surface);border:1px solid var(--border-l);border-radius:var(--radius);padding:28px 32px;box-shadow:var(--shadow);margin-bottom:20px}
+h1{font-family:var(--serif);font-size:32px;font-weight:normal;border-bottom:1px solid var(--border-l);padding-bottom:12px;margin-bottom:20px}
+h2{font-family:var(--serif);font-size:24px;font-weight:normal;border-bottom:1px solid var(--border-l);padding-bottom:8px;margin:24px 0 16px}
+h3{font-size:19px;font-weight:600;margin:20px 0 12px}
+p{margin-bottom:14px}
+.wiki-content{font-size:15px;line-height:1.75}
+.wiki-content table{border-collapse:collapse;width:100%;margin:16px 0}
+.wiki-content th,.wiki-content td{border:1px solid var(--border);padding:10px 14px}
+.wiki-content th{background:var(--bg);font-weight:600}
+.wiki-content .infobox{float:right;width:280px;background:var(--bg);border:1px solid var(--border);padding:16px;margin:0 0 16px 20px;border-radius:var(--radius);font-size:13px}
+.wiki-content .infobox-title{text-align:center;font-weight:bold;font-size:16px;border-bottom:1px solid var(--border-l);padding-bottom:8px;margin-bottom:10px}
+.toc{background:var(--bg);border:1px solid var(--border);padding:16px 20px;border-radius:var(--radius);margin-bottom:20px;display:inline-block;min-width:220px}
+.toc-title{font-weight:700;margin-bottom:10px}
+.toc ul{list-style:none;padding:0}
+.toc-lvl2{padding-left:20px}
+.tabs{display:flex;justify-content:space-between;border-bottom:1px solid var(--border);margin-bottom:20px;gap:4px;flex-wrap:wrap}
+.tabs-group{display:flex;gap:4px}
+.tab{padding:9px 18px;background:var(--bg);border:1px solid var(--border);border-bottom:none;border-radius:var(--radius) var(--radius) 0 0;margin-bottom:-1px;display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text);cursor:pointer}
+.tab:hover{background:var(--surface);text-decoration:none}
+.tab.active{background:var(--surface);font-weight:600;color:var(--accent)}
+/* CAROUSEL */
+.carousel{position:relative;overflow:hidden;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border-l);box-shadow:var(--shadow-lg);margin-bottom:24px}
+.carousel-track{display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.carousel-slide{min-width:100%;padding:0;display:flex;gap:0;align-items:stretch;cursor:pointer;min-height:280px}
+.carousel-slide:hover .carousel-body{background:var(--bg)}
+.carousel-img{width:380px;height:280px;object-fit:cover;flex-shrink:0;background:var(--bg)}
+.carousel-body{flex:1;padding:40px;display:flex;flex-direction:column;justify-content:center;transition:background .2s}
+.carousel-body h3{font-family:var(--serif);font-size:30px;font-weight:normal;margin:0 0 14px;border:none;line-height:1.2}
+.carousel-body p{color:var(--muted);font-size:15px;margin:0}
+.carousel-meta{font-size:12px;color:var(--muted);margin-top:20px;display:flex;gap:14px}
+.carousel-btn{position:absolute;top:50%;transform:translateY(-50%);background:var(--surface);border:1px solid var(--border);width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-lg);z-index:5;color:var(--text);font-size:18px;transition:all .2s}
+.carousel-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);transform:translateY(-50%) scale(1.08)}
+.carousel-btn.prev{left:16px}
+.carousel-btn.next{right:16px}
+.carousel-dots{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:5}
+.carousel-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.6);border:1px solid rgba(0,0,0,.2);cursor:pointer;transition:all .2s}
+.carousel-dot.active{background:var(--accent);width:28px;border-radius:5px;border-color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.grid-card{background:var(--surface);border:1px solid var(--border-l);border-radius:var(--radius);padding:20px;cursor:pointer;transition:all .2s}
+.grid-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
+.grid-card .title{font-family:var(--serif);font-size:19px;color:var(--link);margin-bottom:8px}
+.grid-card .meta{font-size:12px;color:var(--muted);margin-top:12px;display:flex;gap:12px;flex-wrap:wrap}
+.editor-toolbar{display:flex;flex-wrap:wrap;gap:4px;padding:8px;background:var(--bg);border:1px solid var(--border);border-bottom:none;border-radius:var(--radius) var(--radius) 0 0}
+.editor-toolbar button,.editor-toolbar label{padding:7px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;display:flex;align-items:center;gap:5px}
+.editor-toolbar button:hover,.editor-toolbar label:hover{background:var(--bg);border-color:var(--accent);color:var(--accent)}
+.editor-tabs{display:flex;gap:2px;padding:0 8px;background:var(--bg);border:1px solid var(--border);border-top:none;border-bottom:none}
+.editor-tab{padding:8px 18px;background:var(--surface);border:1px solid var(--border);border-bottom:none;border-radius:var(--radius-sm) var(--radius-sm) 0 0;font-size:13px;color:var(--text);cursor:pointer}
+.editor-tab.active{color:var(--accent);font-weight:600}
+.editor-area{width:100%;min-height:500px;padding:24px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);font-size:15px;line-height:1.75;outline:none}
+textarea.editor-area{font-family:Consolas,monospace;font-size:14px;resize:vertical}
+.editor-footer{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;align-items:center}
+.editor-summary{flex:1;min-width:200px;padding:11px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text)}
+.btn{padding:10px 20px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:var(--radius-sm);font-size:13px;display:inline-flex;align-items:center;gap:7px;font-weight:500;cursor:pointer;transition:all .2s}
+.btn:hover{background:var(--bg);border-color:var(--accent);color:var(--accent);text-decoration:none}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:#2a55a3;color:#fff}
+.btn-danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+.btn-warning{background:var(--warning);color:#fff;border-color:var(--warning)}
+.btn-success{background:var(--success);color:#fff;border-color:var(--success)}
+.btn-sm{padding:5px 12px;font-size:12px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);align-items:center;justify-content:center;z-index:1000;padding:20px;backdrop-filter:blur(4px)}
+.modal.active{display:flex}
+.modal-box{background:var(--surface);border-radius:var(--radius);padding:32px;width:100%;max-width:440px;box-shadow:var(--shadow-lg);max-height:90vh;overflow-y:auto}
+.modal-box h3{margin-bottom:20px}
+.modal-box input,.modal-box textarea,.modal-box select{width:100%;padding:11px 14px;margin-bottom:12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none}
+.notify{position:fixed;top:116px;right:20px;padding:14px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);z-index:2000;display:flex;align-items:center;gap:10px;font-size:14px;max-width:400px;animation:slideIn .3s ease}
+@keyframes slideIn{from{transform:translateX(110%);opacity:0}}
+.notify.success{border-left:4px solid var(--success)}
+.notify.error{border-left:4px solid var(--danger)}
+.history-item{padding:14px 18px;border-bottom:1px solid var(--border-l);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.history-item:hover{background:var(--bg)}
+.talk-msg{padding:16px;border-bottom:1px solid var(--border-l)}
+.talk-head{font-size:13px;color:var(--muted);margin-bottom:8px}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.gallery-item{position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:1;background:var(--bg);cursor:pointer;box-shadow:var(--shadow)}
+.gallery-item:hover{transform:scale(1.02);box-shadow:var(--shadow-lg)}
+.gallery-item img{width:100%;height:100%;object-fit:cover}
+.gallery-item .del{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.7);color:#fff;border:none;width:28px;height:28px;border-radius:50%;font-size:12px;opacity:0}
+.gallery-item:hover .del{opacity:1}
+.forum-topic{padding:18px 20px;border:1px solid var(--border-l);border-radius:var(--radius);margin-bottom:12px;background:var(--surface);cursor:pointer}
+.forum-topic:hover{border-color:var(--accent);box-shadow:var(--shadow)}
+.forum-topic h3{border:none;margin:0 0 8px;font-size:17px;color:var(--link)}
+.forum-meta{font-size:12px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
+.forum-reply{padding:16px;border-bottom:1px solid var(--border-l);background:var(--bg);border-radius:var(--radius);margin-bottom:12px}
+.admin-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:14px}
+.admin-table th,.admin-table td{padding:11px 13px;text-align:left;border-bottom:1px solid var(--border-l)}
+.admin-table th{background:var(--bg);font-weight:600;color:var(--muted);text-transform:uppercase;font-size:11px}
+.badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;text-transform:uppercase}
+.badge.user{background:#e3f2fd;color:#1565c0}
+.badge.editor{background:#e8f5e9;color:#2e7d32}
+.badge.admin{background:#fff3e0;color:#e65100}
+.badge.bureaucrat{background:#fce4ec;color:#c2185b}
+.lock-banner{background:#fff3e0;border:1px solid #ffb74d;border-radius:var(--radius);padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:12px;color:#e65100;font-size:14px}
+[data-theme="dark"] .lock-banner{background:rgba(255,183,77,.15);color:#ffb74d}
+.empty{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty i{font-size:48px;margin-bottom:16px;opacity:.4}
+.hidden{display:none!important}
+@media(max-width:1400px){.layout{grid-template-columns:180px 1fr;padding:20px}.banner-col{display:none}}
+@media(max-width:900px){.sidebar{display:none}.layout{grid-template-columns:1fr;padding:14px}.card{padding:20px}.logo-title{display:none}.carousel-slide{flex-direction:column}.carousel-img{width:100%;height:200px}.carousel-body{padding:24px}}
+</style>
+</head>
+<body data-theme="light">
+
+<header>
+  <div class="logo-box" id="logoBox">
+    <img id="siteLogo" src="logo.png" class="logo-img" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'50\' fill=\'%233366cc\'/><text x=\'50\' y=\'60\' font-size=\'42\' text-anchor=\'middle\' fill=\'white\' font-family=\'Georgia\'>W</text></svg>'">
+    <span id="siteName" class="logo-title">Википедия</span>
+  </div>
+  <div class="search-wrap">
+    <input type="text" id="searchInput" class="search-input" placeholder="Поиск в Википедии..." autocomplete="off">
+    <button class="search-btn" id="searchBtn"><i class="fa-solid fa-magnifying-glass"></i></button>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+  <div class="user-area" id="userArea"></div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main" id="main"></main>
+  <aside class="banner-col" id="bannerRight"></aside>
+</div>
+
+<div class="modal" id="loginModal">
+  <div class="modal-box">
+    <h3 id="authTitle"><i class="fa-solid fa-right-to-bracket"></i> Вход</h3>
+    <input type="text" id="authUser" placeholder="Имя пользователя">
+    <input type="password" id="authPass" placeholder="Пароль">
+    <button class="btn btn-primary" style="width:100%;justify-content:center" id="authSubmitBtn">Войти</button>
+    <button class="btn" style="width:100%;margin-top:8px;justify-content:center" id="authToggleBtn">Нет аккаунта? Зарегистрироваться</button>
+    <button class="btn" style="width:100%;margin-top:8px;justify-content:center" id="authCancelBtn">Отмена</button>
+  </div>
+</div>
+
+<div class="modal" id="newsModal">
+  <div class="modal-box">
+    <h3><i class="fa-solid fa-newspaper"></i> Новая новость</h3>
+    <input type="text" id="newsTitle" placeholder="Заголовок">
+    <textarea id="newsContent" rows="3" placeholder="Краткое описание"></textarea>
+    <input type="text" id="newsImage" placeholder="URL картинки">
+    <input type="text" id="newsLink" placeholder="Название статьи">
+    <button class="btn btn-primary" style="width:100%;justify-content:center" id="newsSaveBtn">Опубликовать</button>
+    <button class="btn" style="width:100%;margin-top:8px;justify-content:center" id="newsCancelBtn">Отмена</button>
+  </div>
+</div>
+
+<div class="modal" id="recModal">
+  <div class="modal-box">
+    <h3><i class="fa-solid fa-thumbtack"></i> Новая рекомендация</h3>
+    <input type="text" id="recTitle" placeholder="Название статьи">
+    <button class="btn btn-primary" style="width:100%;justify-content:center" id="recSaveBtn">Добавить</button>
+    <button class="btn" style="width:100%;margin-top:8px;justify-content:center" id="recCancelBtn">Отмена</button>
+  </div>
+</div>
+
+<div class="modal" id="bannerModal">
+  <div class="modal-box">
+    <h3><i class="fa-solid fa-image"></i> Новый баннер (реклама)</h3>
+    <select id="bannerSide">
+      <option value="left">Слева</option>
+      <option value="right">Справа</option>
+    </select>
+    <input type="text" id="bannerImage" placeholder="URL картинки баннера">
+    <input type="text" id="bannerLink" placeholder="URL ссылки при клике">
+    <button class="btn btn-primary" style="width:100%;justify-content:center" id="bannerSaveBtn">Добавить</button>
+    <button class="btn" style="width:100%;margin-top:8px;justify-content:center" id="bannerCancelBtn">Отмена</button>
+  </div>
+</div>
+
+<script>
+var API={token:localStorage.getItem('wiki_token'),
+  req:async function(m,u,d){var h={'Content-Type':'application/json'};if(this.token)h['Authorization']='Bearer '+this.token;var r=await fetch(u,{method:m,headers:h,body:d?JSON.stringify(d):undefined});var j=await r.json().catch(function(){return{}});if(!r.ok)throw new Error(j.error||'Ошибка '+r.status);return j},
+  get:function(u){return this.req('GET',u)},post:function(u,d){return this.req('POST',u,d)},
+  del:function(u){return this.req('DELETE',u)},
+  setToken:function(t){this.token=t;localStorage.setItem('wiki_token',t)},
+  clear:function(){this.token=null;localStorage.removeItem('wiki_token')}};
+
+// Декодирование названий, если они случайно сохранились закодированными
+function decodeTitle(t){
+  if(!t||typeof t!=='string')return t||'';
+  if(!/%[0-9A-Fa-f]{2}/.test(t))return t;
+  try{var d=decodeURIComponent(t);if(!/[\uFFFD]/.test(d)&&d!==t)return d}catch(e){}
+  return t;
+}
+
+var Parser={parse:function(text){
+  if(!text)return'';
+  var h=text;
+  var headings=text.match(/^(===?) (.+?) ===?$/gm);
+  if(headings&&headings.length>=3){var toc='<div class="toc"><div class="toc-title">Содержание</div><ul>';
+    headings.forEach(function(m){var l=m.indexOf('=== ')===0;toc+='<li class="'+(l?'toc-lvl2':'')+'">'+m.replace(/^=+ /,'').replace(/ =+$/,'')+'</li>'});
+    toc+='</ul></div>';h=toc+h}
+  h=h.replace(/^=== (.+?) ===$/gm,'<h3>$1</h3>');
+  h=h.replace(/^== (.+?) ==$/gm,'<h2>$1</h2>');
+  h=h.replace(/'''''(.+?)'''''/g,'<b><i>$1</i></b>');
+  h=h.replace(/'''(.+?)'''/g,'<b>$1</b>');
+  h=h.replace(/''(.+?)''/g,'<i>$1</i>');
+  h=h.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g,function(m,p,l){return'<a data-page="'+encodeURIComponent(p)+'">'+(l||p)+'</a>'});
+  h=h.replace(/\[(https?:\/\/[^\s\]]+)\s+([^\]]+)\]/g,'<a href="$1" target="_blank">$2</a>');
+  h=h.replace(/\{\{Инфобокс\|([\s\S]*?)\}\}/gi,function(m,c){var l=c.split('|');var t=l[0].trim();var b='<div class="infobox"><div class="infobox-title">'+t+'</div>';for(var i=1;i<l.length;i++){var kv=l[i].split('=');if(kv[0]&&kv[1])b+='<div style="margin-bottom:6px"><b>'+kv[0].trim()+':</b> '+kv[1].trim()+'</div>'}return b+'</div>'});
+  h=h.split(/\n{2,}/).map(function(p){p=p.trim();if(!p)return'';if(/^<(h\d|div|table|ul|ol)/.test(p))return p;return'<p>'+p.replace(/\n/g,'<br>')+'</p>'}).join('');
+  return h}};
+
+var app={user:null,carouselIdx:0,carouselTimer:null,authMode:'login',
+
+init:async function(){
+  document.body.setAttribute('data-theme',localStorage.getItem('wiki_theme')||'light');
+  if(API.token){try{var r=await API.get('/api/auth/me');this.user=r.user}catch(e){API.clear()}}
+  await this.loadSettings();
+  this.renderHeader();this.renderSidebar();this.loadBanners();this.bindEvents();
+  var self=this;window.addEventListener('hashchange',function(){self.route()});this.route()},
+
+loadSettings:async function(){try{var s=await API.get('/api/settings');if(s.siteName)document.getElementById('siteName').textContent=s.siteName;if(s.logoUrl)document.getElementById('siteLogo').src=s.logoUrl}catch(e){}},
+
+loadBanners:async function(){
+  try{
+    var banners=await API.get('/api/banners');
+    var right=document.getElementById('bannerRight');
+    var rightBanners=banners.filter(function(b){return b.side==='right'});
+    if(!rightBanners.length){right.innerHTML='';return}
+    right.innerHTML=rightBanners.map(function(b){
+      var click=b.link_url?'onclick="window.open(\''+b.link_url+'\',\'_blank\')"':'';
+      return '<div class="banner-card" '+click+'><img src="'+b.image_url+'" alt="Баннер" onerror="this.parentNode.style.display=\'none\'"><div class="banner-label">Реклама</div></div>';
+    }).join('');
+  }catch(e){console.warn('banners error',e)}},
+
+bindEvents:function(){var self=this;
+  document.getElementById('logoBox').onclick=function(){self.go('home')};
+  document.getElementById('searchBtn').onclick=function(){self.doSearch()};
+  document.getElementById('searchInput').oninput=function(){self.liveSearch(this.value)};
+  document.getElementById('searchInput').onkeydown=function(e){if(e.key==='Enter')self.doSearch()};
+  document.getElementById('authSubmitBtn').onclick=function(){self.doLogin()};
+  document.getElementById('authToggleBtn').onclick=function(){self.toggleAuth()};
+  document.getElementById('authCancelBtn').onclick=function(){self.closeModal('loginModal')};
+  document.getElementById('newsSaveBtn').onclick=function(){self.saveNews()};
+  document.getElementById('newsCancelBtn').onclick=function(){self.closeModal('newsModal')};
+  document.getElementById('recSaveBtn').onclick=function(){self.saveRec()};
+  document.getElementById('recCancelBtn').onclick=function(){self.closeModal('recModal')};
+  document.getElementById('bannerSaveBtn').onclick=function(){self.saveBanner()};
+  document.getElementById('bannerCancelBtn').onclick=function(){self.closeModal('bannerModal')};
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('.search-wrap'))document.getElementById('searchResults').classList.remove('active');
+    var l=e.target.closest('[data-page]');if(l){e.preventDefault();self.go('article/'+l.dataset.page);return}
+    var n=e.target.closest('[data-nav]');if(n){e.preventDefault();self.go(n.dataset.nav);return}
+    var a=e.target.closest('[data-action]');if(a){e.preventDefault();self.handleAction(a.dataset.action,a.dataset)}})},
+
+handleAction:function(action,data){var self=this;
+  var h={logout:function(){self.logout()},theme:function(){self.toggleTheme()},
+    openAuth:function(){self.openAuth(data.mode)},showNewsModal:function(){self.openModal('newsModal')},
+    showRecModal:function(){self.openModal('recModal')},showBannerModal:function(){self.openModal('bannerModal')},
+    saveEdit:function(){self.saveEdit()},previewEdit:function(){self.previewEdit()},
+    editorTabVisual:function(){self.editorTab('visual')},editorTabCode:function(){self.editorTab('code')},
+    editorBold:function(){editor.cmd('bold')},editorItalic:function(){editor.cmd('italic')},
+    editorH2:function(){editor.cmd('formatBlock','<h2>')},editorH3:function(){editor.cmd('formatBlock','<h3>')},
+    editorP:function(){editor.cmd('formatBlock','<p>')},editorUL:function(){editor.cmd('insertUnorderedList')},
+    editorOL:function(){editor.cmd('insertOrderedList')},editorLink:function(){editor.insertLink()},
+    editorTable:function(){editor.insertTable()},editorInfobox:function(){editor.insertInfobox()},
+    editorWiki:function(){editor.insertWiki()},carouselPrev:function(){self.carouselPrev()},
+    carouselNext:function(){self.carouselNext()},carouselDot:function(){self.carouselGo(parseInt(data.idx))},
+    watchPage:function(){self.toggleWatch(decodeURIComponent(data.title))},
+    protectPage:function(){self.toggleProtect(decodeURIComponent(data.title))},
+    deletePage:function(){self.deletePage(decodeURIComponent(data.title))},
+    createTopic:function(){self.createTopic()},replyTopic:function(){self.replyTopic(data.id)},
+    saveSettings:function(){self.saveSettings()},toggleBlock:function(){self.toggleBlock(data.id)},
+    delRec:function(){self.delRec(data.id)},deletePhoto:function(){self.deletePhoto(data.id)},
+    rollback:function(){self.rollback(decodeURIComponent(data.title),data.rev)},
+    addTalk:function(){self.addTalk(decodeURIComponent(data.title))},
+    delBanner:function(){self.delBanner(data.id)},toggleBanner:function(){self.toggleBanner(data.id)}};
+  if(h[action])h[action]()},
+
+renderHeader:function(){var el=document.getElementById('userArea');
+  if(this.user){var ia=['admin','bureaucrat'].indexOf(this.user.role)>-1;var ie=['admin','bureaucrat','editor'].indexOf(this.user.role)>-1;
+    var h='<span style="color:var(--muted)"><i class="fa-solid fa-user-circle"></i> <b style="color:var(--text)">'+this.user.username+'</b></span>';
+    if(ie)h+='<a data-action="showNewsModal"><i class="fa-solid fa-plus"></i> Новость</a>';
+    if(ia)h+='<a data-nav="admin" style="color:var(--danger)"><i class="fa-solid fa-shield-halved"></i> Админ</a>';
+    h+='<a data-action="logout" style="color:var(--muted)"><i class="fa-solid fa-right-from-bracket"></i> Выход</a>';
+    el.innerHTML=h}
+  else{el.innerHTML='<button class="btn-header outline" data-action="openAuth" data-mode="login"><i class="fa-solid fa-right-to-bracket"></i> Вход</button><button class="btn-header" data-action="openAuth" data-mode="register"><i class="fa-solid fa-user-plus"></i> Регистрация</button>'}},
+
+renderSidebar:function(){var ia=this.user&&['admin','bureaucrat'].indexOf(this.user.role)>-1;
+  var h='<div class="side-title">Навигация</div><ul class="side-list">';
+  h+='<li><a class="side-link" data-nav="home"><i class="fa-solid fa-house"></i> Заглавная</a></li>';
+  h+='<li><a class="side-link" data-nav="recent"><i class="fa-solid fa-clock-rotate-left"></i> Свежие правки</a></li>';
+  h+='<li><a class="side-link" data-nav="all"><i class="fa-solid fa-list"></i> Все страницы</a></li>';
+  h+='<li><a class="side-link" data-nav="forum"><i class="fa-solid fa-comments"></i> Форум</a></li>';
+  h+='<li><a class="side-link" data-nav="gallery"><i class="fa-solid fa-images"></i> Галерея</a></li></ul>';
+  h+='<div class="side-title">Участие</div><ul class="side-list">';
+  h+='<li><a class="side-link" data-nav="create"><i class="fa-solid fa-plus"></i> Создать статью</a></li>';
+  h+='<li><a class="side-link" data-nav="watchlist"><i class="fa-solid fa-star"></i> Наблюдение</a></li>';
+  h+='<li><a class="side-link" data-nav="contribs"><i class="fa-solid fa-user-pen"></i> Мой вклад</a></li></ul>';
+  h+='<div class="side-title">Инструменты</div><ul class="side-list">';
+  h+='<li><a class="side-link" data-action="theme"><i class="fa-solid fa-moon"></i> Сменить тему</a></li>';
+  if(ia)h+='<li><a class="side-link" data-nav="admin"><i class="fa-solid fa-shield-halved"></i> Админ-панель</a></li>';
+  h+='</ul>';
+  document.getElementById('sidebar').innerHTML=h},
+
+openAuth:function(m){this.authMode=m;
+  document.getElementById('authTitle').innerHTML=m==='login'?'<i class="fa-solid fa-right-to-bracket"></i> Вход':'<i class="fa-solid fa-user-plus"></i> Регистрация';
+  document.getElementById('authToggleBtn').textContent=m==='login'?'Нет аккаунта? Зарегистрироваться':'Есть аккаунт? Войти';
+  this.openModal('loginModal')},
+toggleAuth:function(){this.openAuth(this.authMode==='login'?'register':'login')},
+
+doLogin:async function(){var u=document.getElementById('authUser').value.trim();var p=document.getElementById('authPass').value.trim();
+  if(!u||!p)return this.notify('Заполните поля','error');
+  try{var url=this.authMode==='login'?'/api/auth/login':'/api/auth/register';
+    var r=await API.post(url,{username:u,password:p});
+    API.setToken(r.token);this.user=r.user;this.closeModal('loginModal');
+    this.renderHeader();this.renderSidebar();
+    this.notify('Добро пожаловать, '+r.user.username+'!','success');this.route()}
+  catch(e){this.notify(e.message,'error')}},
+
+logout:function(){API.clear();this.user=null;this.renderHeader();this.renderSidebar();this.go('home')},
+toggleTheme:function(){var n=document.body.getAttribute('data-theme')==='light'?'dark':'light';document.body.setAttribute('data-theme',n);localStorage.setItem('wiki_theme',n)},
+go:function(p){window.location.hash='#/'+p},
+
+route:async function(){var hash=window.location.hash.substring(2)||'home';var main=document.getElementById('main');
+  main.innerHTML='<div class="card"><div class="empty"><i class="fa-solid fa-spinner fa-spin"></i><p>Загрузка...</p></div></div>';
+  if(this.carouselTimer){clearInterval(this.carouselTimer);this.carouselTimer=null}
+  var parts=hash.split('/');var view=parts[0];var param=parts.slice(1).map(decodeURIComponent).join('/');
+  try{
+    if(view==='home')await this.viewHome();
+    else if(view==='article')await this.viewArticle(param);
+    else if(view==='edit')await this.viewEditor(param);
+    else if(view==='create')await this.viewEditor('');
+    else if(view==='history')await this.viewHistory(param);
+    else if(view==='talk')await this.viewTalk(param);
+    else if(view==='recent')await this.viewRecent();
+    else if(view==='all')await this.viewAll();
+    else if(view==='watchlist')await this.viewWatchlist();
+    else if(view==='contribs')await this.viewContribs();
+    else if(view==='forum')await this.viewForum();
+    else if(view==='topic')await this.viewTopic(param);
+    else if(view==='gallery')await this.viewGallery();
+    else if(view==='admin')await this.viewAdmin();
+    else await this.viewArticle(param)}
+  catch(e){main.innerHTML='<div class="card"><div class="empty"><i class="fa-solid fa-circle-exclamation" style="color:var(--danger)"></i><p><b>Ошибка:</b> '+e.message+'</p><p style="margin-top:10px;font-size:13px">Проверьте, что сервер запущен и БД обновлена.</p></div></div>'}},
+
+viewHome:async function(){var news=[],recs=[],pages=[];
+  try{news=await API.get('/api/news')}catch(e){}
+  try{recs=await API.get('/api/recommendations')}catch(e){}
+  try{pages=await API.get('/api/pages')}catch(e){}
+  var html='';
+  if(news.length>0){
+    html+='<div class="carousel"><button class="carousel-btn prev" data-action="carouselPrev"><i class="fa-solid fa-chevron-left"></i></button><div class="carousel-track" id="carouselTrack">';
+    news.forEach(function(n){
+      var link=n.article_link?' data-page="'+encodeURIComponent(n.article_link)+'"':'';
+      var img=n.image_url||'https://via.placeholder.com/380x280/3366cc/ffffff?text=News';
+      html+='<div class="carousel-slide"'+link+'><img class="carousel-img" src="'+img+'" onerror="this.src=\'https://via.placeholder.com/380x280/3366cc/ffffff?text=News\'">';
+      html+='<div class="carousel-body"><h3>'+n.title+'</h3><p>'+(n.content||'')+'</p><div class="carousel-meta"><i class="fa-solid fa-user"></i> '+(n.username||'Аноним')+' <i class="fa-solid fa-clock"></i> '+new Date(n.created_at).toLocaleDateString()+'</div></div></div>'});
+    html+='</div><button class="carousel-btn next" data-action="carouselNext"><i class="fa-solid fa-chevron-right"></i></button><div class="carousel-dots">';
+    news.forEach(function(n,i){html+='<div class="carousel-dot'+(i===0?' active':'')+'" data-action="carouselDot" data-idx="'+i+'"></div>'});
+    html+='</div></div>'}
+  if(recs.length>0){html+='<div class="card"><h2 style="margin-top:0"><i class="fa-solid fa-thumbtack" style="color:var(--accent)"></i> Рекомендуем прочитать</h2><div class="grid">';
+    recs.forEach(function(r){html+='<div class="grid-card" data-page="'+encodeURIComponent(r.page_title)+'"><div class="title">'+decodeTitle(r.page_title)+'</div><div class="meta"><i class="fa-solid fa-star" style="color:var(--warning)"></i> Рекомендация</div></div>'});
+    html+='</div></div>'}
+  if(pages.length>0){html+='<div class="card"><h2 style="margin-top:0"><i class="fa-solid fa-book" style="color:var(--accent)"></i> Статьи в Википедии</h2><div class="grid">';
+    pages.slice(0,12).forEach(function(p){
+      var title=decodeTitle(p.title);
+      html+='<div class="grid-card" data-page="'+encodeURIComponent(p.title)+'"><div class="title">'+title+'</div>';
+      html+='<div class="meta"><span><i class="fa-solid fa-file"></i> '+p.namespace+'</span>';
+      if(p.protected)html+='<span style="color:var(--warning)"><i class="fa-solid fa-lock"></i> Защищена</span>';
+      html+='</div></div>'});
+    html+='</div></div>'}
+  else{html+='<div class="card"><div class="empty"><i class="fa-solid fa-book-open"></i><p>Пока нет статей. <a data-nav="create">Создайте первую</a>!</p></div></div>'}
+  document.getElementById('main').innerHTML=html;
+  if(news.length>1){this.carouselIdx=0;var self=this;this.carouselTimer=setInterval(function(){self.carouselNext()},7000)}},
+
+carouselGo:function(i){var track=document.getElementById('carouselTrack');if(!track)return;var total=track.children.length;this.carouselIdx=(i+total)%total;track.style.transform='translateX(-'+(this.carouselIdx*100)+'%)';document.querySelectorAll('.carousel-dot').forEach(function(d,idx){d.classList.toggle('active',idx===this.carouselIdx)},this)},
+carouselNext:function(){this.carouselGo(this.carouselIdx+1)},
+carouselPrev:function(){this.carouselGo(this.carouselIdx-1)},
+
+viewArticle:async function(title){if(!title)return this.go('home');var main=document.getElementById('main');
+  var isEditor=this.user&&['admin','bureaucrat','editor'].indexOf(this.user.role)>-1;
+  var isAdmin=this.user&&['admin','bureaucrat'].indexOf(this.user.role)>-1;
+  try{var data=await API.get('/api/pages/'+encodeURIComponent(title));var page=data.page,revision=data.revision;var text=revision?revision.text:'';var t=encodeURIComponent(title);
+    var displayTitle=decodeTitle(page.title);
+    var h='<div class="card"><div class="tabs"><div class="tabs-group"><a class="tab active" data-page="'+t+'"><i class="fa-solid fa-file-lines"></i> Статья</a><a class="tab" data-nav="talk/'+t+'"><i class="fa-solid fa-comments"></i> Обсуждение</a></div><div class="tabs-group"><a class="tab active"><i class="fa-solid fa-book-open"></i> Читать</a>';
+    if(this.user&&(!page.protected||isEditor))h+='<a class="tab" data-nav="edit/'+t+'"><i class="fa-solid fa-pen"></i> Править</a>';
+    else if(page.protected)h+='<a class="tab" style="color:var(--warning);cursor:not-allowed" title="Только администраторы/редакторы могут править"><i class="fa-solid fa-lock"></i> Защищена</a>';
+    h+='<a class="tab" data-nav="history/'+t+'"><i class="fa-solid fa-clock-rotate-left"></i> История</a>';
+    if(this.user)h+='<a class="tab" data-action="watchPage" data-title="'+t+'"><i class="fa-regular fa-star"></i> Наблюдать</a>';
+    h+='</div></div>';
+    if(page.protected)h+='<div class="lock-banner"><i class="fa-solid fa-lock"></i> <b>Страница защищена.</b> Редактировать могут только администраторы и редакторы.</div>';
+    h+='<h1>'+displayTitle+'</h1><div class="wiki-content">'+(Parser.parse(text)||'<p><i>Статья пуста.</i></p>')+'</div>';
+    if(isAdmin){h+='<div style="margin-top:30px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-action="protectPage" data-title="'+t+'"><i class="fa-solid fa-'+(page.protected?'unlock':'lock')+'"></i> '+(page.protected?'Снять защиту':'Защитить')+'</button><button class="btn btn-danger" data-action="deletePage" data-title="'+t+'"><i class="fa-solid fa-trash"></i> Удалить</button></div>'}
+    h+='</div>';main.innerHTML=h}
+  catch(e){var displayTitle=decodeTitle(title);var h2='<div class="card"><h1>'+displayTitle+'</h1><div class="empty"><i class="fa-solid fa-file-circle-question"></i><p>Страница не существует.</p>';
+    if(this.user)h2+='<a class="btn btn-primary" data-nav="edit/'+encodeURIComponent(title)+'"><i class="fa-solid fa-plus"></i> Создать статью</a>';
+    else h2+='<p style="margin-top:10px"><a data-action="openAuth" data-mode="login">Войдите</a>, чтобы создать статью.</p>';
+    h2+='</div></div>';main.innerHTML=h2}},
+
+toggleWatch:async function(title){if(!this.user)return this.openAuth('login');try{var r=await API.post('/api/pages/'+encodeURIComponent(title)+'/watch');this.notify(r.watched?'Добавлено':'Удалено','success')}catch(e){this.notify(e.message,'error')}},
+toggleProtect:async function(title){try{var r=await API.post('/api/admin/pages/'+encodeURIComponent(title)+'/protect');this.notify(r.protected?'🔒 Защищена':'🔓 Защита снята','success');this.route()}catch(e){this.notify(e.message,'error')}},
+deletePage:async function(title){if(!confirm('Удалить «'+decodeTitle(title)+'»?'))return;try{await API.del('/api/admin/pages/'+encodeURIComponent(title));this.notify('Удалено','success');this.go('home')}catch(e){this.notify(e.message,'error')}},
+
+viewEditor:async function(title){if(!this.user)return this.openAuth('login');var text='',isNew=true;
+  if(title){try{var r=await API.get('/api/pages/'+encodeURIComponent(title));text=r.revision?r.revision.text:'';isNew=false;
+    if(r.page.protected&&!['admin','bureaucrat','editor'].includes(this.user.role)){this.notify('🔒 Страница защищена. У вас нет прав.','error');return this.go('article/'+encodeURIComponent(title))}
+  }catch(e){isNew=true}}
+  var displayTitle=isNew?'':decodeTitle(title);
+  var safeTitle=displayTitle.replace(/"/g,'&quot;');
+  var h='<div class="card"><h1 style="border:none;margin-bottom:16px"><i class="fa-solid fa-pen-to-square"></i> '+(isNew?'Создание статьи':'Редактирование: '+displayTitle)+'</h1>';
+  h+='<input type="text" id="edTitle" value="'+safeTitle+'" placeholder="Название статьи" style="width:100%;padding:14px 18px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text);font-size:18px;font-family:var(--serif);margin-bottom:16px;outline:none">';
+  h+='<div class="editor-tabs"><button class="editor-tab active" id="tabVisual" data-action="editorTabVisual"><i class="fa-solid fa-eye"></i> Визуально</button><button class="editor-tab" id="tabCode" data-action="editorTabCode"><i class="fa-solid fa-code"></i> Код</button></div>';
+  h+='<div class="editor-toolbar"><button data-action="editorBold" title="Жирный"><i class="fa-solid fa-bold"></i></button><button data-action="editorItalic" title="Курсив"><i class="fa-solid fa-italic"></i></button><button data-action="editorH2">H2</button><button data-action="editorH3">H3</button><button data-action="editorP">Абзац</button><button data-action="editorUL"><i class="fa-solid fa-list-ul"></i></button><button data-action="editorOL"><i class="fa-solid fa-list-ol"></i></button><button data-action="editorLink"><i class="fa-solid fa-link"></i> Статья</button><button data-action="editorTable"><i class="fa-solid fa-table"></i></button><button data-action="editorInfobox"><i class="fa-solid fa-id-card"></i></button><button data-action="editorWiki"><i class="fa-solid fa-wikipedia-w"></i> Викитекст</button><label><i class="fa-solid fa-image"></i> Фото <input type="file" id="edImg" style="display:none" accept="image/*"></label></div>';
+  h+='<div id="visualEditor" class="editor-area" contenteditable="true">'+text+'</div><textarea id="codeEditor" class="editor-area hidden">'+text+'</textarea>';
+  h+='<div class="editor-footer"><input type="text" id="edSummary" class="editor-summary" placeholder="Описание изменений"><label style="display:flex;align-items:center;gap:6px;font-size:13px"><input type="checkbox" id="edMinor"> Малая правка</label><button class="btn btn-primary" data-action="saveEdit"><i class="fa-solid fa-save"></i> Сохранить</button><button class="btn" data-action="previewEdit"><i class="fa-solid fa-eye"></i> Предпросмотр</button></div></div>';
+  document.getElementById('main').innerHTML=h;
+  document.getElementById('edImg').onchange=function(ev){editor.upload(ev)}},
+
+editorTab:function(w){var vis=document.getElementById('visualEditor');var code=document.getElementById('codeEditor');document.querySelectorAll('.editor-tab').forEach(function(t){t.classList.remove('active')});
+  if(w==='visual'){code.classList.add('hidden');vis.classList.remove('hidden');vis.innerHTML=code.value;document.getElementById('tabVisual').classList.add('active')}
+  else{vis.classList.add('hidden');code.classList.remove('hidden');code.value=vis.innerHTML;document.getElementById('tabCode').classList.add('active')}},
+
+saveEdit:async function(){var title=document.getElementById('edTitle').value.trim();if(!title)return this.notify('Введите название','error');
+  var vis=document.getElementById('visualEditor');var code=document.getElementById('codeEditor');var isCode=!code.classList.contains('hidden');
+  var text=isCode?code.value:vis.innerHTML;var summary=document.getElementById('edSummary').value||'Нет описания';var minor=document.getElementById('edMinor').checked;
+  try{await API.post('/api/pages/'+encodeURIComponent(title),{text:text,summary:summary,minor:minor});this.notify('Сохранено!','success');this.go('article/'+encodeURIComponent(title))}catch(e){this.notify(e.message,'error')}},
+
+previewEdit:function(){var vis=document.getElementById('visualEditor');var code=document.getElementById('codeEditor');var isCode=!code.classList.contains('hidden');var text=isCode?code.value:vis.innerHTML;
+  var w=window.open('','_blank');w.document.write('<html><head><title>Предпросмотр</title><style>body{font-family:sans-serif;max-width:800px;margin:20px auto;padding:20px;line-height:1.6}h2{border-bottom:1px solid #ccc}table{border-collapse:collapse}td,th{border:1px solid #ccc;padding:6px}.infobox{float:right;width:280px;background:#f8f9fa;border:1px solid #ccc;padding:15px;margin:0 0 15px 15px}</style></head><body>'+Parser.parse(text)+'</body></html>')},
+
+viewHistory:async function(title){var revs=await API.get('/api/pages/'+encodeURIComponent(title)+'/revisions');
+  var isEditor=this.user&&['admin','bureaucrat','editor'].indexOf(this.user.role)>-1;var t=encodeURIComponent(title);
+  var h='<div class="card"><h1><i class="fa-solid fa-clock-rotate-left"></i> История: '+decodeTitle(title)+'</h1>';
+  if(!revs.length)h+='<p>Нет версий.</p>';
+  else revs.forEach(function(r,i){h+='<div class="history-item"><div><b>'+new Date(r.created_at).toLocaleString()+'</b> — <b>'+r.username+'</b>';
+    if(r.minor)h+=' <i style="color:var(--muted)">(малая)</i>';
+    h+='<div style="font-size:13px;color:var(--muted);margin-top:4px">'+(r.summary||'')+'</div></div>';
+    if(isEditor&&i>0)h+='<button class="btn btn-sm" data-action="rollback" data-title="'+t+'" data-rev="'+r.id+'"><i class="fa-solid fa-rotate-left"></i> Откатить</button>';h+='</div>'});
+  h+='</div>';document.getElementById('main').innerHTML=h},
+
+rollback:async function(title,revId){if(!confirm('Откатить?'))return;try{await API.post('/api/pages/'+encodeURIComponent(title)+'/rollback/'+revId);this.notify('Откат выполнен','success');this.route()}catch(e){this.notify(e.message,'error')}},
+
+viewTalk:async function(title){var msgs=await API.get('/api/pages/'+encodeURIComponent(title)+'/talk');
+  var h='<div class="card"><div class="tabs"><div class="tabs-group"><a class="tab" data-page="'+encodeURIComponent(title)+'"><i class="fa-solid fa-file-lines"></i> Статья</a><a class="tab active"><i class="fa-solid fa-comments"></i> Обсуждение</a></div></div><h1>Обсуждение: '+decodeTitle(title)+'</h1>';
+  if(!msgs.length)h+='<p style="color:var(--muted)">Пока нет сообщений.</p>';
+  else msgs.forEach(function(m){h+='<div class="talk-msg"><div class="talk-head"><b>'+m.username+'</b> • '+new Date(m.created_at).toLocaleString()+'</div><p>'+m.text+'</p></div>'});
+  if(this.user)h+='<h3>Ваше сообщение</h3><textarea id="talkText" rows="3" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text)"></textarea><button class="btn btn-primary" style="margin-top:10px" data-action="addTalk" data-title="'+encodeURIComponent(title)+'"><i class="fa-solid fa-paper-plane"></i> Отправить</button>';
+  h+='</div>';document.getElementById('main').innerHTML=h},
+
+addTalk:async function(title){var text=document.getElementById('talkText').value.trim();if(!text)return;try{await API.post('/api/pages/'+encodeURIComponent(title)+'/talk',{text:text});this.notify('Отправлено','success');this.route()}catch(e){this.notify(e.message,'error')}},
+
+viewRecent:async function(){var list=await API.get('/api/recent');var h='<div class="card"><h1><i class="fa-solid fa-clock-rotate-left"></i> Свежие правки</h1>';
+  if(!list.length)h+='<p>Правок ещё не было.</p>';
+  else list.forEach(function(r){h+='<div class="history-item"><div><b>'+new Date(r.created_at).toLocaleString()+'</b> — <b>'+(r.username||'Аноним')+'</b> изменил <a data-page="'+encodeURIComponent(r.title)+'">'+decodeTitle(r.title)+'</a></div><div style="font-size:12px;color:var(--muted)">'+(r.summary||'')+'</div></div>'});
+  h+='</div>';document.getElementById('main').innerHTML=h},
+
+viewAll:async function(){var pages=await API.get('/api/pages');var h='<div class="card"><h1><i class="fa-solid fa-list"></i> Все страницы</h1><div class="grid">';
+  pages.forEach(function(p){h+='<div class="grid-card" data-page="'+encodeURIComponent(p.title)+'"><div class="title">'+decodeTitle(p.title)+'</div><div class="meta">'+p.namespace+(p.protected?' <i class="fa-solid fa-lock" style="color:var(--warning)"></i>':'')+'</div></div>'});
+  h+='</div></div>';document.getElementById('main').innerHTML=h},
+
+viewWatchlist:async function(){if(!this.user)return this.openAuth('login');var list=await API.get('/api/watchlist');
+  var h='<div class="card"><h1><i class="fa-solid fa-star"></i> Список наблюдения</h1>';
+  if(!list.length)h+='<p>Список пуст.</p>';
+  else h+='<div class="grid">'+list.map(function(p){return'<div class="grid-card" data-page="'+encodeURIComponent(p.title)+'"><div class="title">'+decodeTitle(p.title)+'</div></div>'}).join('')+'</div>';
+  h+='</div>';document.getElementById('main').innerHTML=h},
+
+viewContribs:async function(){if(!this.user)return this.openAuth('login');var pages=await API.get('/api/pages');var contribs=[];
+  for(var i=0;i<pages.length;i++){try{var revs=await API.get('/api/pages/'+encodeURIComponent(pages[i].title)+'/revisions');var mine=revs.filter(function(r){return r.username===this.user.username}.bind(this));if(mine.length)contribs.push({title:pages[i].title,count:mine.length})}catch(e){}}
+  var h='<div class="card"><h1><i class="fa-solid fa-user-pen"></i> Мой вклад</h1>';
+  if(!contribs.length)h+='<p>Вы пока не редактировали статьи.</p>';
+  else h+='<div class="grid">'+contribs.map(function(c){return'<div class="grid-card" data-page="'+encodeURIComponent(c.title)+'"><div class="title">'+decodeTitle(c.title)+'</div><div class="meta">'+c.count+' правок</div></div>'}).join('')+'</div>';
+  h+='</div>';document.getElementById('main').innerHTML=h},
+
+viewForum:async function(){var topics=await API.get('/api/forum');var h='<div class="card"><h1><i class="fa-solid fa-comments"></i> Форум</h1>';
+  if(this.user){h+='<div style="background:var(--bg);padding:20px;border-radius:var(--radius);margin-bottom:20px"><h3 style="margin-top:0">Создать тему</h3><input type="text" id="fTitle" placeholder="Заголовок темы" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);margin-bottom:8px"><textarea id="fContent" rows="3" placeholder="Опишите вашу тему" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);margin-bottom:8px"></textarea><button class="btn btn-primary" data-action="createTopic"><i class="fa-solid fa-paper-plane"></i> Опубликовать</button></div>'}
+  else h+='<p><a data-action="openAuth" data-mode="login">Войдите</a>, чтобы создавать темы.</p>';
+  if(!topics.length)h+='<p>Пока нет тем.</p>';
+  else topics.forEach(function(t){h+='<div class="forum-topic" data-nav="topic/'+t.id+'"><h3>'+t.title+'</h3><div style="font-size:13px;color:var(--muted);margin-bottom:6px">'+t.content.substring(0,150)+'...</div><div class="forum-meta"><span><i class="fa-solid fa-user"></i> '+t.username+'</span><span><i class="fa-solid fa-comment"></i> '+t.replies_count+' ответов</span><span><i class="fa-solid fa-clock"></i> '+new Date(t.created_at).toLocaleDateString()+'</span></div></div>'});
+  h+='</div>';document.getElementById('main').innerHTML=h},
+
+createTopic:async function(){var title=document.getElementById('fTitle').value.trim();var content=document.getElementById('fContent').value.trim();if(!title||!content)return this.notify('Заполните поля','error');try{var r=await API.post('/api/forum',{title:title,content:content});this.notify('Тема создана','success');this.go('topic/'+r.id)}catch(e){this.notify(e.message,'error')}},
+
+viewTopic:async function(id){var data=await API.get('/api/forum/'+id);var topic=data.topic,replies=data.replies;
+  var h='<div class="card"><h1><i class="fa-solid fa-comments"></i> '+topic.title+'</h1>';
+  h+='<div style="margin-bottom:20px"><div class="talk-head"><b>'+topic.username+'</b> • '+new Date(topic.created_at).toLocaleString()+'</div><p>'+topic.content+'</p></div>';
+  h+='<h2>Ответы ('+replies.length+')</h2>';
+  if(!replies.length)h+='<p style="color:var(--muted)">Пока нет ответов.</p>';
+  else replies.forEach(function(r){h+='<div class="forum-reply"><div class="talk-head"><b>'+r.username+'</b> • '+new Date(r.created_at).toLocaleString()+'</div><p>'+r.content+'</p></div>'});
+  if(this.user)h+='<h3>Ваш ответ</h3><textarea id="replyText" rows="3" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text)"></textarea><button class="btn btn-primary" style="margin-top:10px" data-action="replyTopic" data-id="'+id+'"><i class="fa-solid fa-paper-plane"></i> Отправить</button>';
+  h+='</div>';document.getElementById('main').innerHTML=h},
+
+replyTopic:async function(id){var content=document.getElementById('replyText').value.trim();if(!content)return;try{await API.post('/api/forum/'+id+'/reply',{content:content});this.notify('Отправлено','success');this.route()}catch(e){this.notify(e.message,'error')}},
+
+viewGallery:async function(){var items=await API.get('/api/gallery');var isAdmin=this.user&&['admin','bureaucrat'].indexOf(this.user.role)>-1;
+  var h='<div class="card"><h1><i class="fa-solid fa-images"></i> Галерея</h1>';
+  if(this.user)h+='<div style="margin-bottom:20px"><label class="btn btn-primary"><i class="fa-solid fa-cloud-arrow-up"></i> Загрузить фото <input type="file" id="galInput" style="display:none" accept="image/*" multiple></label></div>';
+  if(!items.length)h+='<p style="color:var(--muted)">Фотографий пока нет.</p>';
+  else h+='<div class="gallery-grid">'+items.map(function(g){var del=(this.user&&(this.user.username===g.username||isAdmin))?'<button class="del" data-action="deletePhoto" data-id="'+g.id+'"><i class="fa-solid fa-trash"></i></button>':'';return'<div class="gallery-item"><img src="'+g.url+'" alt="'+g.filename+'">'+del+'</div>'},this).join('')+'</div>';
+  h+='</div>';document.getElementById('main').innerHTML=h;
+  var self=this;var inp=document.getElementById('galInput');if(inp)inp.onchange=function(ev){self.uploadGallery(ev)}},
+
+uploadGallery:async function(ev){var files=[].slice.call(ev.target.files);if(!files.length)return;
+  for(var i=0;i<files.length;i++){var fd=new FormData();fd.append('file',files[i]);var r=await fetch('/api/gallery/upload',{method:'POST',headers:{Authorization:'Bearer '+API.token},body:fd});if(!r.ok){this.notify('Ошибка загрузки','error');return}}
+  this.notify('Загружено!','success');this.route()},
+
+deletePhoto:async function(id){if(!confirm('Удалить фото?'))return;try{await API.del('/api/gallery/'+id);this.route()}catch(e){this.notify(e.message,'error')}},
+
+viewAdmin:async function(){if(!this.user||['admin','bureaucrat'].indexOf(this.user.role)<0)return this.go('home');
+  var users=await API.get('/api/admin/users');var rowsHtml='';
+  users.forEach(function(u){var actions='<i style="color:var(--muted)">—</i>';
+    if(u.username!=='разработчик26'){actions='<button class="btn btn-sm '+(u.blocked?'btn-success':'btn-danger')+'" data-action="toggleBlock" data-id="'+u.id+'">'+(u.blocked?'Разблок':'Блок')+'</button> ';
+      actions+='<select data-role-user="'+u.id+'" style="padding:5px;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px">';
+      ['user','editor','admin','bureaucrat'].forEach(function(r){actions+='<option value="'+r+'"'+(u.role===r?' selected':'')+'>'+r+'</option>'});actions+='</select>'}
+    rowsHtml+='<tr><td><b>'+u.username+'</b></td><td><span class="badge '+u.role+'">'+u.role+'</span></td><td style="color:'+(u.blocked?'var(--danger)':'var(--success)')+'">'+(u.blocked?'Заблокирован':'Активен')+'</td><td>'+actions+'</td></tr>'});
+  var h='<div class="card"><h1><i class="fa-solid fa-shield-halved"></i> Панель Разработчика</h1>';
+  h+='<h2 style="margin-top:24px">Настройки сайта</h2>';
+  h+='<input type="text" id="aSName" placeholder="Название сайта" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);margin-bottom:10px">';
+  h+='<input type="text" id="aLogo" placeholder="URL логотипа" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);margin-bottom:10px">';
+  h+='<button class="btn btn-primary" data-action="saveSettings"><i class="fa-solid fa-save"></i> Сохранить</button>';
+  h+='<h2 style="margin-top:30px"><i class="fa-solid fa-image"></i> Баннеры (реклама)</h2>';
+  h+='<button class="btn btn-primary" data-action="showBannerModal"><i class="fa-solid fa-plus"></i> Добавить баннер</button>';
+  h+='<div id="bannerList" style="margin-top:12px"></div>';
+  h+='<h2 style="margin-top:30px">Пользователи</h2>';
+  h+='<table class="admin-table"><thead><tr><th>Логин</th><th>Роль</th><th>Статус</th><th>Действия</th></tr></thead><tbody>'+rowsHtml+'</tbody></table>';
+  h+='<h2 style="margin-top:30px">Рекомендации на главной</h2>';
+  h+='<button class="btn btn-primary" data-action="showRecModal"><i class="fa-solid fa-plus"></i> Добавить</button>';
+  h+='<div id="recList" style="margin-top:12px"></div></div>';
+  document.getElementById('main').innerHTML=h;
+  var self=this;
+  try{var s=await API.get('/api/settings');document.getElementById('aSName').value=s.siteName||'';document.getElementById('aLogo').value=s.logoUrl||''}catch(e){}
+  var recs=await API.get('/api/recommendations');
+  document.getElementById('recList').innerHTML=recs.map(function(r){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:6px"><span><b>'+decodeTitle(r.page_title)+'</b></span><button class="btn btn-sm btn-danger" data-action="delRec" data-id="'+r.id+'"><i class="fa-solid fa-trash"></i></button></div>'}).join('')||'<p style="color:var(--muted)">Нет рекомендаций.</p>';
+  try{var banners=await API.get('/api/banners');
+    document.getElementById('bannerList').innerHTML=banners.map(function(b){return'<div style="display:flex;gap:12px;align-items:center;padding:10px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:6px"><img src="'+b.image_url+'" style="height:40px;border-radius:4px"><div style="flex:1"><b>'+b.side+'</b> · '+(b.active?'активен':'выключен')+'</div><button class="btn btn-sm '+(b.active?'btn-warning':'btn-success')+'" data-action="toggleBanner" data-id="'+b.id+'">'+(b.active?'Выкл':'Вкл')+'</button><button class="btn btn-sm btn-danger" data-action="delBanner" data-id="'+b.id+'"><i class="fa-solid fa-trash"></i></button></div>'}).join('')||'<p style="color:var(--muted)">Нет баннеров.</p>'}catch(e){}
+  document.querySelectorAll('[data-role-user]').forEach(function(sel){sel.onchange=function(){self.changeRole(sel.dataset.roleUser,sel.value)}})},
+
+saveSettings:async function(){var siteName=document.getElementById('aSName').value.trim();var logoUrl=document.getElementById('aLogo').value.trim();try{await API.post('/api/settings',{siteName:siteName,logoUrl:logoUrl});await this.loadSettings();this.notify('Сохранено','success')}catch(e){this.notify(e.message,'error')}},
+toggleBlock:async function(id){try{await API.post('/api/admin/users/'+id+'/block');this.viewAdmin()}catch(e){this.notify(e.message,'error')}},
+changeRole:async function(id,role){try{await API.post('/api/admin/users/'+id+'/role',{role:role});this.notify('Роль изменена','success')}catch(e){this.notify(e.message,'error')}},
+delRec:async function(id){try{await API.del('/api/recommendations/'+id);this.viewAdmin()}catch(e){this.notify(e.message,'error')}},
+delBanner:async function(id){if(!confirm('Удалить баннер?'))return;try{await API.del('/api/banners/'+id);this.viewAdmin();this.loadBanners()}catch(e){this.notify(e.message,'error')}},
+toggleBanner:async function(id){try{await API.post('/api/banners/'+id+'/toggle');this.viewAdmin();this.loadBanners()}catch(e){this.notify(e.message,'error')}},
+saveBanner:async function(){var side=document.getElementById('bannerSide').value;var image_url=document.getElementById('bannerImage').value.trim();var link_url=document.getElementById('bannerLink').value.trim();if(!image_url)return this.notify('Введите URL картинки','error');
+  try{await API.post('/api/banners',{side:side,image_url:image_url,link_url:link_url});this.closeModal('bannerModal');this.notify('Баннер добавлен','success');this.viewAdmin();this.loadBanners()}catch(e){this.notify(e.message,'error')}},
+
+saveRec:async function(){var title=document.getElementById('recTitle').value.trim();if(!title)return this.notify('Введите название','error');try{await API.post('/api/recommendations',{page_title:title});this.closeModal('recModal');this.notify('Добавлено','success');this.viewAdmin()}catch(e){this.notify(e.message,'error')}},
+
+saveNews:async function(){var title=document.getElementById('newsTitle').value.trim();var content=document.getElementById('newsContent').value.trim();var image_url=document.getElementById('newsImage').value.trim();var article_link=document.getElementById('newsLink').value.trim();if(!title)return this.notify('Введите заголовок','error');
+  try{await API.post('/api/news',{title:title,content:content,image_url:image_url,article_link:article_link});this.closeModal('newsModal');this.notify('Опубликовано','success');this.go('home')}catch(e){this.notify(e.message,'error')}},
+
+liveSearch:function(q){var box=document.getElementById('searchResults');if(!q||q.length<2){box.classList.remove('active');return}var self=this;clearTimeout(this._st);
+  this._st=setTimeout(async function(){try{var res=await API.get('/api/search?q='+encodeURIComponent(q));if(!res.length){box.classList.remove('active');return}
+    box.innerHTML=res.slice(0,8).map(function(r){return'<div class="search-item" data-page="'+encodeURIComponent(r.title)+'"><div class="t">'+decodeTitle(r.title)+'</div><div class="s">'+((r.snippet||'').replace(/<[^>]+>/g,'').substring(0,80))+'...</div></div>'}).join('');box.classList.add('active')}catch(e){}},250)},
+
+doSearch:function(){var q=document.getElementById('searchInput').value.trim();if(q){document.getElementById('searchResults').classList.remove('active');this.go('article/'+encodeURIComponent(q))}},
+
+openModal:function(id){document.getElementById(id).classList.add('active')},
+closeModal:function(id){document.getElementById(id).classList.remove('active')},
+notify:function(msg,type){type=type||'success';var n=document.createElement('div');n.className='notify '+type;n.innerHTML='<i class="fa-solid '+(type==='success'?'fa-check-circle':'fa-circle-exclamation')+'" style="color:var(--'+type+')"></i> <span>'+msg+'</span>';document.body.appendChild(n);setTimeout(function(){n.remove()},3000)}};
+
+var editor={cmd:function(c,v){if(v===undefined)v=null;if(c==='formatBlock'&&v&&v.indexOf('<')!==0)v='<'+v+'>';document.execCommand(c,false,v);var ve=document.getElementById('visualEditor');if(ve)ve.focus()},
+insertLink:function(){var p=prompt('Введите название статьи:');if(p)this.cmd('insertHTML','<a data-page="'+encodeURIComponent(p)+'">'+p+'</a>')},
+insertTable:function(){this.cmd('insertHTML','<table><tbody><tr><th>Заголовок 1</th><th>Заголовок 2</th></tr><tr><td>Ячейка</td><td>Ячейка</td></tr></tbody></table><p><br></p>')},
+insertInfobox:function(){var t=prompt('Заголовок карточки:')||'Карточка';this.cmd('insertHTML','<div class="infobox"><div class="infobox-title">'+t+'</div><div><b>Параметр:</b> Значение</div></div><p><br></p>')},
+insertWiki:function(){var w=prompt('Вставьте викитекст:');if(!w)return;this.cmd('insertHTML',Parser.parse(w))},
+upload:function(ev){var f=ev.target.files[0];if(!f)return;var reader=new FileReader();var self=this;reader.onload=function(e){self.cmd('insertImage',e.target.result)};reader.readAsDataURL(f)}};
+
+window.onload=function(){try{app.init()}catch(e){document.body.innerHTML='<div style="padding:50px;font-family:sans-serif"><h1 style="color:red">Ошибка:</h1><p style="font-size:18px;margin-top:20px">'+e.message+'</p></div>'}};
+</script>
+</body>
+</html>
